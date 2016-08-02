@@ -1,0 +1,11 @@
+ var todoViews = Backbone.Views.extend({
+ 
+ });
+
+var todoCollections = Backbone.Collection.extend({
+
+});
+
+var todoModels = Backbone.Model.extend({
+
+});
