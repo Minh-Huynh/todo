@@ -94,8 +94,8 @@ $(function(){
 			$("#title_date").html("All Todos <span id='todoCount'>" + count + "</span>");
 		},
 		convertEmptyString: function(obj){
-			return _.map(obj, function(key, val){
-				val = val || undefined;
+			return _.each(obj, function(val, key){
+				obj[key] = val || undefined;
 			});
 		},
 		template: Handlebars.compile($("#task_line_items").html()),    
@@ -103,10 +103,13 @@ $(function(){
 
 	var App = {
 		nextId: 0,
-		bindNewTaskHandler: function(){
+		bind: function(){
 			$("#add_link").on("click", this.showNewTaskInput);
 			$("#add_header").on("keypress","#add_field", this.initialNewTask);
 			$(document).on("click", ".complete_btn",this.completeTask);
+			$("#burger_label").on("click", function(){
+				$(".menu").toggle();
+			});
 		},
 		showNewTaskInput: function(e){
 			e.preventDefault();
@@ -130,11 +133,12 @@ $(function(){
 			}
 		},
 		init: function(){
-			this.bindNewTaskHandler();
+			this.bind();
 			this.eventObj = _.extend({}, Backbone.Events);
 			this.todos = new todoCollections;
 			this.view = new todoViews({collection: this.todos, eventObj: this.eventObj});
 			this.menuView = new menuView({collection: this.todos, eventObj: this.eventObj});
+
 		}
 
 	};

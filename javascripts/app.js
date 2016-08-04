@@ -1,12 +1,9 @@
 $(function(){
-	var todoModels = Backbone.Model.extend({
-		toggleComplete: function(){
-			this.set({complete: !this.complete}) ;
-		}
+	var Todo = Backbone.Model.extend({
 	});
 
-	var todoCollections = Backbone.Collection.extend({
-		model: todoModels
+	var Todos = Backbone.Collection.extend({
+		model: Todo
 	});
 
 	var menuView = Backbone.View.extend({
@@ -48,93 +45,51 @@ $(function(){
 		}
 	});
 
-	var todoViews = Backbone.View.extend({
-		events: {
-			"submit form" : "saveForm",
-	    		"click .delete_row" : "deleteTodo"
-		},
-	    	el: "#task_list",
-	    	deleteTodo: function(e){
-			var id = +$(e.target).closest("li").attr("data-id");
-			this.collection.remove(id);
-		},
-	    	filterList: function(data){
-			var filtered_todos = _.filter(this.collection.toJSON(), function(model){
-				return model.year == data.year && model.month == data.month && model.complete == data.complete;
-			});
-			var title = $("#title_date");
-			this.$el.html(this.template({todos: filtered_todos}));
-			if(data.month && data.year){
-				title.html(data.month + "/" + data.year + "<span id='todoCount'>" + filtered_todos.length + "</span>");
-			}
-			else{
-				title.html("No Due Dates <span id='todoCount'>" + filtered_todos.length + "</span>");
-			}
-		},
-	    	saveForm: function(e){
-			e.preventDefault();
-			var todo_id = +e.target.getAttribute("data-id"),
-			    form_data = $(e.target).serializeArray(),
-			    data_obj = this.convertEmptyString(_.object(_.map(form_data, _.values)));
-			this.collection.get(todo_id).set(data_obj);
-			$("input[type='checkbox']:checked").prop("checked", false);
-		},
-		initialize: function(options){
-		       this.listenTo(this.collection, "add remove change:complete", this.render);
-		       _.bindAll(this,"filterList");
-		       _.bindAll(this,"render");
-			options.eventObj.bind("filter_main_list", this.filterList);
-			options.eventObj.bind("display_all", this.render);
+	var TodoViews = Backbone.View.extend({
+		el: "#task_list",
+		initialize: function(){
+	    		this.render();
 		},
 		render: function(){
-			var count = this.collection.toJSON().length;
-			this.$el.html(this.template({todos: this.collection.toJSON()}));
-			$(".all_todos_count").html(count);
-			$("#todoCount").html(count);
-			$("#title_date").html("All Todos <span id='todoCount'>" + count + "</span>");
-		},
-		convertEmptyString: function(obj){
-			return _.each(obj, function(val, key){
-				obj[key] = val || undefined;
-			});
-		},
-		template: Handlebars.compile($("#task_line_items").html()),    
+	    		this.collection.each(function(task){
+				this.$el.append(new TodoView({model: task});
+				}
+		}			
 	 });
 
+	var TodoView = Backbone.View.extend({
+		template: Handlebars.compile($("#task_line_item").html()),
+	    	initialize: function(){
+			this.render();
+			this.listenTo(this.model, "remove", this.remove);
+			this.listenTo(this.model, "change:complete", this.completed);
+			this.listenTo(this.model, "change:name change:due_date change:description", this.updateFormData);
+		},
+	    	render: function(){
+			return this.template(this.model.toJSON());
+		}
+	}
+
 	var App = {
-		nextId: 0,
-		bindNewTaskHandler: function(){
-			$("#add_link").on("click", this.showNewTaskInput);
+		todos: new Todos(),
+		bind: function(){
 			$("#add_header").on("keypress","#add_field", this.initialNewTask);
-			$(document).on("click", ".complete_btn",this.completeTask);
 		},
-		showNewTaskInput: function(e){
-			e.preventDefault();
-			$(this).html("<img src='img/add.png' /><input id='add_field' type='text'></input></a>");
-		$("#add_field").focus();
-			
-		},
-		completeTask: function(e){
-			e.preventDefault();
-			var todoId = +$(e.target).closest("form").attr("data-id");
-			App.todos.get(todoId).toggleComplete();
-		},	
 		initialNewTask: function(e){
 			if(e.which == 13){
 				var name = $(this).val(),
 				    id = App.nextId;
 				App.nextId++;
-				App.todos.add({task_name: name, id: id, complete: false});
+				App.todos.add({task_name: name, complete: false});
 				$(this).trigger("blur").val("");
 				$("#add_header input").replaceWith("Add new to do");
 			}
 		},
 		init: function(){
-			this.bindNewTaskHandler();
-			this.eventObj = _.extend({}, Backbone.Events);
-			this.todos = new todoCollections;
-			this.view = new todoViews({collection: this.todos, eventObj: this.eventObj});
-			this.menuView = new menuView({collection: this.todos, eventObj: this.eventObj});
+			this.bind();
+			this.view = new todoViews({collection:this.todos});
+			this.menuView = new menuView({collection: this.todos });
+
 		}
 
 	};

@@ -252,7 +252,10 @@ $(function(){
 			$("#task_list").on("click","form input[value = 'Mark as Complete']", this.onMarkasComplete);
 			$(".menu").on("click","li",this.onMenuRowClick);
 			$(".menu").on("click","#all_todos_header",this.onAllToDosRowClick);
-			$(".menu").on("click",".completed h2", this.onAllCompletedRowClick);			
+			$(".menu").on("click",".completed h2", this.onAllCompletedRowClick);
+			$("#burger_label").on("click", function(){
+				$(".menu").toggle();
+			});			
 		},
 		init: function(){
 			this.bind();

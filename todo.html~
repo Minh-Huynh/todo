@@ -39,7 +39,7 @@
   			<ul id="incomplete_todos">
 			{{#each due_date_group}}
 				{{#unless complete}}
-					{{#if month}}<li data-month ={{month}} data-year= {{year}} data-complete="">{{month}}/{{year}}<span>{{count}}</span></li>
+					{{#if month}}<li data-month ={{month}} data-year= {{year}} data-complete="false">{{month}}/{{year}}<span>{{count}}</span></li>
 				  		{{else}}
 				  		<li data-month= ""  data-year="" data-complete="false">No Due Date<span>{{count}}</span></li>	
 					{{/if}}	

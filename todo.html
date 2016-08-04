@@ -9,9 +9,8 @@
     <script src="javascripts/backbone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
     <script src="javascripts/app.js"></script>
-    <script type="text/x-handlebars" id="task_line_items">
-{{#each todos}}
-    	<li class="list_item {{#if this.complete}} checked {{/if}}" data-id = "{{id}}">
+    <script type="text/x-handlebars" id="task_line_item">
+    	<li class="list_item {{#if complete}} checked {{/if}}" data-id = "{{id}}">
           <label><input type="checkbox"><span class="task_name">{{this.task_name}}</span><img class = "delete_row" src="img/trash.png"/>
     				<div class="modal">
     					<form data-id = "{{this.id}}">
@@ -31,7 +30,6 @@
     				<div class="modal_layer"></div><div class="due_date">{{#if this.due_date}}Due Date: {{this.due_date}}{{/if}}</div>
     			</label>
 	</li>
-{{/each}}
     </script>
 <script type="text/x-handlebars" id="menu_view">
   		<div class="todo_menu">
